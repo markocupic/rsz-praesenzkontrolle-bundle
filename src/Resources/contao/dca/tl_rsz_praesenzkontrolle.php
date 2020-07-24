@@ -308,7 +308,7 @@ class tl_rsz_praesenzkontrolle extends Contao\Backend
         $mysql = $this->Database->prepare('SELECT start_date,trainers FROM tl_rsz_praesenzkontrolle WHERE id=?')->execute($row['id']);
         if (time() > strtotime($mysql->start_date))
         {
-            $status = '<div style="display:inline; padding-right:3px;"><img src="bundles/markocupicrszpraesenzkontrolle/accept.png" alt="history" title="abgelaufen"></div>';
+            $status = '<div style="display:inline; padding-right:3px;"><img src="bundles/markocupicrszpraesenzkontrolle/check.svg" alt="history" title="abgelaufen"></div>';
         }
         else
         {
