@@ -1,0 +1,48 @@
+{
+  "name": "markocupic/rsz-praesenzkontrolle-bundle",
+  "description": "Präsenzkontrolle für Regionalkontrolle Sportklettern Zentralschweiz",
+  "keywords": [
+    "Präsenzliste nach dem Training im Backend führen",
+    "Contao",
+    "Backend",
+    "RSZ",
+    "Regionalzentrum Sportklettern Zentralschweiz"
+  ],
+  "type": "contao-bundle",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Marko Cupic",
+      "email": "m.cupic@gmx.ch",
+      "homepage": "https://github.com/markocupic",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/markocupic/rsz-praesenzkontrolle-bundle/issues",
+    "source": "https://github.com/markocupic/rsz-praesenzkontrolle-bundle"
+  },
+  "require": {
+    "contao/core-bundle": "^4.9",
+    "phpoffice/phpspreadsheet": "^1.14",
+    "markocupic/rsz-benutzerverwaltung-bundle": "dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "Markocupic\\RszPraesenzkontrolleBundle\\": "src/"
+    },
+    "classmap": [
+      "src/Resources/contao"
+    ],
+    "exclude-from-classmap": [
+      "src/Resources/contao/config",
+      "src/Resources/contao/dca",
+      "src/Resources/contao/languages",
+      "src/Resources/contao/templates"
+    ]
+  },
+  "extra": {
+    "contao-manager-plugin": "Markocupic\\RszPraesenzkontrolleBundle\\ContaoManager\\Plugin"
+  }
+}
+
