@@ -17,7 +17,7 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
     // Config
     'config'   => [
         'dataContainer'    => 'Table',
-        'pTable'           => 'tl_jahresprogramm',
+        'pTable'           => 'tl_rsz_jahresprogramm',
         'enableVersioning' => true,
         'closed'           => true,
         'notCopyable'      => true,
@@ -92,7 +92,7 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
         'id'         => [
             'sql' => "int(10) unsigned NOT NULL auto_increment"],
         'pid'        => [
-            'foreignKey' => 'tl_jahresprogramm.id',
+            'foreignKey' => 'tl_rsz_jahresprogramm.id',
             'sql'        => "int(10) unsigned NOT NULL default '0'",
             'relation'   => ['type' => 'belongsTo', 'load' => 'lazy']
         ],
@@ -211,7 +211,7 @@ class tl_rsz_praesenzkontrolle extends Contao\Backend
      */
     public function createAllEvents()
     {
-        $db = $this->Database->execute('SELECT * FROM tl_jahresprogramm');
+        $db = $this->Database->execute('SELECT * FROM tl_rsz_jahresprogramm');
 
         while ($db->next())
         {

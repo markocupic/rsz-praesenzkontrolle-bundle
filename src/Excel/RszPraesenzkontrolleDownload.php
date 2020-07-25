@@ -174,7 +174,7 @@ class RszPraesenzkontrolleDownload
         $eventArr = [];
         foreach ($eventId as $id)
         {
-            $db = $databaseAdapter->getInstance()->prepare('SELECT art FROM tl_jahresprogramm WHERE id=?')->execute($id);
+            $db = $databaseAdapter->getInstance()->prepare('SELECT art FROM tl_rsz_jahresprogramm WHERE id=?')->execute($id);
             $eventArr[] = ['art' => $db->art];
         }
 
