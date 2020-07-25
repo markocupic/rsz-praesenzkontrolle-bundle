@@ -279,7 +279,7 @@ class tl_rsz_praesenzkontrolle extends Contao\Backend
     private function excelExport()
     {
         $objExport = \Contao\System::getContainer()
-            ->get('Markocupic\RszPraesenzkontrolleBundle\BenutzerverwaltungBundle\Excel\RszPraesenzkontrolleDownload');
+            ->get('Markocupic\RszPraesenzkontrolleBundle\Excel\RszPraesenzkontrolleDownload');
         $objExport->excelExport();
     }
 
