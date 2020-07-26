@@ -12,8 +12,9 @@
 /**
  * Legends
  */
+$GLOBALS['TL_LANG']['tl_rsz_praesenzkontrolle']['event_legend'] = 'Event-Einstellungen';
 $GLOBALS['TL_LANG']['tl_rsz_praesenzkontrolle']['Kommentar'] = 'Name, Adresse und Geburtsdatum';
-$GLOBALS['TL_LANG']['tl_rsz_praesenzkontrolle']['participiants'] = 'Teilnehmer';
+$GLOBALS['TL_LANG']['tl_rsz_praesenzkontrolle']['participants'] = 'Teilnehmer';
 
 /**
  * Global Operations

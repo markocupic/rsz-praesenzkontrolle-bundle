@@ -92,6 +92,9 @@ class RszPraesenzkontrolleDownload
         /** @var Database $databaseAdapter */
         $databaseAdapter = $this->framework->getAdapter(Database::class);
 
+        /** @var  $dateAdapter Date */
+        $dateAdapter = $this->framework->getAdapter(Date::class);
+
         // Trainer Datenarray erstellen
         $data_arr_trainer = [];
         $db = $databaseAdapter->getInstance()->prepare('SELECT id, name FROM tl_user WHERE funktion LIKE ? ORDER BY name ASC')->execute('%Trainer%');
@@ -167,8 +170,6 @@ class RszPraesenzkontrolleDownload
             $eventId[] = $db->pid;
             $eventComments[] = $db->comment;
         }
-        // Count all events
-        $countEvents = count($dateArr);
 
         // Hilfsarrays mit den Eventdaten
         $eventArr = [];
@@ -186,7 +187,7 @@ class RszPraesenzkontrolleDownload
         $arrRow[] = '';
         foreach ($dateArr as $date)
         {
-            $arrRow[] = $date;
+            $arrRow[] = Date::parse('Y-m-d', $date);
         }
         $arrRows[] = $arrRow;
 

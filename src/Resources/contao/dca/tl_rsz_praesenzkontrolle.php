@@ -44,7 +44,6 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
         ],
         'label'             => [
             'fields'         => ['start_date', 'event'],
-            'format'         => '%s',
             'format'         => '<span>#STATUS# %s [%s]&nbsp;&nbsp;&nbsp;Trainer: #TRAINERS#</span>',
             'label_callback' => ['tl_rsz_praesenzkontrolle', 'labelCallback'],
         ],
@@ -84,8 +83,8 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
         ]
     ],
     // Palettes
-    'palettes' => ['__selector__' => [],
-                   'default'      => 'start_date,end_date,event,hours;{participiants},athletes,trainers;{Kommentar zum Training},comment'
+    'palettes' => [
+        'default' => '{event_legend},start_date,end_date,event,hours;{participiants},athletes,trainers;{Kommentar zum Training},comment'
     ],
     // Fields
     'fields'   => [
@@ -104,16 +103,18 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'inputType' => 'text',
             'search'    => true,
             'sorting'   => true,
-            'eval'      => ['readonly' => true, 'mandatory' => true, 'maxlength' => 10, 'tl_class' => 'w50'],
-            'sql'       => "varchar(30) NOT NULL default ''"
+            'flag'      => 5,
+            'eval'      => ['readonly' => true, 'mandatory' => true, 'datepicker' => false, 'rgxp' => 'date', 'tl_class' => 'w50'],
+            'sql'       => "int(10) unsigned NOT NULL default '0'",
         ],
         'end_date'   => [
             'exclude'   => true,
             'inputType' => 'text',
             'search'    => true,
             'sorting'   => true,
-            'eval'      => ['readonly' => true, 'mandatory' => true, 'maxlength' => 10, 'tl_class' => 'w50'],
-            'sql'       => "varchar(30) NOT NULL default ''"
+            'flag'      => 5,
+            'eval'      => ['readonly' => true, 'mandatory' => true, 'datepicker' => false, 'rgxp' => 'date', 'tl_class' => 'w50'],
+            'sql'       => "int(10) unsigned NOT NULL default '0'",
         ],
         'event'      => [
             'exclude'   => true,
@@ -218,9 +219,14 @@ class tl_rsz_praesenzkontrolle extends Contao\Backend
             $db2 = $this->Database
                 ->prepare('SELECT * FROM tl_rsz_praesenzkontrolle WHERE pid=?')
                 ->execute($db->id);
-            if ($db2->numRows < 1)
+            if (!$db2->numRows)
             {
-                $arrSet = ['start_date' => \Contao\Date::parse("Y-m-d", $db->start_date), 'end_date' => \Contao\Date::parse("Y-m-d", $db->end_date), 'event' => $db->art, 'pid' => $db->id,];
+                $arrSet = [
+                    'start_date' => $db->start_date,
+                    'end_date'   => $db->end_date,
+                    'event'      => $db->art,
+                    'pid'        => $db->id
+                ];
                 $this->Database->prepare("INSERT INTO tl_rsz_praesenzkontrolle %s")
                     ->set($arrSet)
                     ->execute();
@@ -228,8 +234,8 @@ class tl_rsz_praesenzkontrolle extends Contao\Backend
             else
             {
                 $arrSet = [
-                    'start_date' => \Contao\Date::parse("Y-m-d", $db->start_date),
-                    'end_date'   => \Contao\Date::parse("Y-m-d", $db->end_date),
+                    'start_date' => $db->start_date,
+                    'end_date'   => $db->end_date,
                     'event'      => $db->art,
                     'pid'        => $db->id,
                 ];
@@ -305,8 +311,8 @@ class tl_rsz_praesenzkontrolle extends Contao\Backend
 
         $label = str_replace('#TRAINERS#', $strTrainers, $label);
 
-        $mysql = $this->Database->prepare('SELECT start_date,trainers FROM tl_rsz_praesenzkontrolle WHERE id=?')->execute($row['id']);
-        if (time() > strtotime($mysql->start_date))
+        $mysql = $this->Database->prepare('SELECT * FROM tl_rsz_praesenzkontrolle WHERE id=?')->execute($row['id']);
+        if (time() > $mysql->start_date)
         {
             $status = '<div style="display:inline; padding-right:3px;"><img src="bundles/markocupicrszpraesenzkontrolle/check.svg" alt="history" title="abgelaufen"></div>';
         }
