@@ -132,7 +132,8 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'sorting'          => true,
             'flag'             => 1,
             'options_callback' => ['tl_rsz_praesenzkontrolle', 'getTrainers'],
-            'eval'             => ['multiple' => true, 'tl_class' => ''], 'sql' => "text NOT NULL"
+            'eval'             => ['multiple' => true, 'tl_class' => ''],
+            'sql' => "text NOT NULL default=''"
         ],
         'athletes'   => [
             'exclude'          => true,
@@ -142,7 +143,7 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'flag'             => 1,
             'options_callback' => ['tl_rsz_praesenzkontrolle', 'getAthletes'],
             'eval'             => ['multiple' => true, 'tl_class' => ''],
-            'sql'              => "text NOT NULL"
+            'sql'              => "text NOT NULL default=''"
         ],
         'hours'      => [
             'exclude'   => true,
@@ -164,7 +165,7 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'flag'      => 1,
             'filter'    => true,
             'eval'      => ['tl_class' => '', 'rte' => false, 'allowHtml' => true, 'rows' => 4, 'style' => 'height: 80px;'],
-            'sql'       => "text NOT NULL"
+            'sql'       => "text NOT NULL default=''"
         ]
     ]
 ];
