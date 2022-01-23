@@ -19,19 +19,25 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
         'dataContainer'    => 'Table',
         'pTable'           => 'tl_rsz_jahresprogramm',
         'enableVersioning' => true,
-        'closed'           => true,
-        'notCopyable'      => true,
+        'closed'           => false,
+        'notCopyable'      => false,
         // Except admins (see tl_rsz_praesenzkontrolle.modifyDca())
-        'notDeletable'     => true,
+        'notDeletable'     => false,
         'sql'              => [
             'keys' => [
                 'id'  => 'primary',
                 'pid' => 'index',
-            ]
+            ],
         ],
         'onload_callback'  => [
-            ['tl_rsz_praesenzkontrolle', 'createAllEvents'],
-            ['tl_rsz_praesenzkontrolle', 'modifyDca'],
+            [
+                'tl_rsz_praesenzkontrolle',
+                'createAllEvents',
+            ],
+            [
+                'tl_rsz_praesenzkontrolle',
+                'modifyDca',
+            ],
         ],
     ],
     'list'     => [
@@ -43,16 +49,22 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'disableGrouping' => true,
         ],
         'label'             => [
-            'fields'         => ['start_date', 'event'],
+            'fields'         => [
+                'start_date',
+                'event',
+            ],
             'format'         => '<span>#STATUS# %s [%s]&nbsp;&nbsp;&nbsp;Trainer: #TRAINERS#</span>',
-            'label_callback' => ['tl_rsz_praesenzkontrolle', 'labelCallback'],
+            'label_callback' => [
+                'tl_rsz_praesenzkontrolle',
+                'labelCallback',
+            ],
         ],
         'global_operations' => [
             'all'         => [
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'       => 'act=select',
                 'class'      => 'header_edit_all',
-                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
+                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'excelExport' => [
                 'label'      => &$GLOBALS['TL_LANG']['tl_rsz_praesenzkontrolle']['excelExport'],
@@ -66,37 +78,41 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'edit'   => [
                 'label' => &$GLOBALS['TL_LANG']['tl_rsz_praesenzkontrolle']['edit'],
                 'href'  => 'act=edit',
-                'icon'  => 'edit.gif'
+                'icon'  => 'edit.gif',
             ],
             'delete' => [
                 'label'      => &$GLOBALS['TL_LANG']['tl_rsz_praesenzkontrolle']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.gif',
-                'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"'
+                'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
             ],
             'show'   => [
                 'label'      => &$GLOBALS['TL_LANG']['tl_rsz_praesenzkontrolle']['show'],
                 'href'       => 'act=show',
                 'icon'       => 'show.gif',
-                'attributes' => 'style="margin-right:3px"'
+                'attributes' => 'style="margin-right:3px"',
             ],
-        ]
+        ],
     ],
     // Palettes
     'palettes' => [
-        'default' => '{event_legend},start_date,end_date,event,hours;{participiants},athletes,trainers;{Kommentar zum Training},comment'
+        'default' => '{event_legend},start_date,end_date,event,hours;{participiants},athletes,trainers;{Kommentar zum Training},comment',
     ],
     // Fields
     'fields'   => [
         'id'         => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment"],
+            'sql' => "int(10) unsigned NOT NULL auto_increment",
+        ],
         'pid'        => [
             'foreignKey' => 'tl_rsz_jahresprogramm.id',
             'sql'        => "int(10) unsigned NOT NULL default '0'",
-            'relation'   => ['type' => 'belongsTo', 'load' => 'lazy']
+            'relation'   => [
+                'type' => 'belongsTo',
+                'load' => 'lazy',
+            ],
         ],
         'tstamp'     => [
-            'sql' => "int(10) unsigned NOT NULL default '0'"
+            'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'start_date' => [
             'exclude'   => true,
@@ -104,7 +120,13 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'search'    => true,
             'sorting'   => true,
             'flag'      => 5,
-            'eval'      => ['readonly' => true, 'mandatory' => true, 'datepicker' => false, 'rgxp' => 'date', 'tl_class' => 'w50'],
+            'eval'      => [
+                'readonly'   => true,
+                'mandatory'  => true,
+                'datepicker' => false,
+                'rgxp'       => 'date',
+                'tl_class'   => 'w50',
+            ],
             'sql'       => "int(10) unsigned NOT NULL default '0'",
         ],
         'end_date'   => [
@@ -113,7 +135,13 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'search'    => true,
             'sorting'   => true,
             'flag'      => 5,
-            'eval'      => ['readonly' => true, 'mandatory' => true, 'datepicker' => false, 'rgxp' => 'date', 'tl_class' => 'w50'],
+            'eval'      => [
+                'readonly'   => true,
+                'mandatory'  => true,
+                'datepicker' => false,
+                'rgxp'       => 'date',
+                'tl_class'   => 'w50',
+            ],
             'sql'       => "int(10) unsigned NOT NULL default '0'",
         ],
         'event'      => [
@@ -122,8 +150,12 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'search'    => true,
             'filter'    => true,
             'sorting'   => true,
-            'eval'      => ['readonly' => true, 'mandatory' => true, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''"
+            'eval'      => [
+                'readonly'  => true,
+                'mandatory' => true,
+                'tl_class'  => 'w50',
+            ],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'trainers'   => [
             'exclude'          => true,
@@ -131,9 +163,15 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'search'           => true,
             'sorting'          => true,
             'flag'             => 1,
-            'options_callback' => ['tl_rsz_praesenzkontrolle', 'getTrainers'],
-            'eval'             => ['multiple' => true, 'tl_class' => ''],
-            'sql' => "text NOT NULL default ''"
+            'options_callback' => [
+                'tl_rsz_praesenzkontrolle',
+                'getTrainers',
+            ],
+            'eval'             => [
+                'multiple' => true,
+                'tl_class' => '',
+            ],
+            'sql'              => "blob NULL",
         ],
         'athletes'   => [
             'exclude'          => true,
@@ -141,9 +179,15 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'search'           => true,
             'sorting'          => true,
             'flag'             => 1,
-            'options_callback' => ['tl_rsz_praesenzkontrolle', 'getAthletes'],
-            'eval'             => ['multiple' => true, 'tl_class' => ''],
-            'sql'              => "text NOT NULL default ''"
+            'options_callback' => [
+                'tl_rsz_praesenzkontrolle',
+                'getAthletes',
+            ],
+            'eval'             => [
+                'multiple' => true,
+                'tl_class' => '',
+            ],
+            'sql'              => "blob NULL",
         ],
         'hours'      => [
             'exclude'   => true,
@@ -153,8 +197,12 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'filter'    => true,
             'flag'      => 1,
             'default'   => '3',
-            'options'   => ['3' => '3 Stunden', '5' => '5 Stunden'],
-            'eval'      => ['tl_class' => 'w50'], 'sql' => "varchar(2) NOT NULL default ''"
+            'options'   => [
+                '3' => '3 Stunden',
+                '5' => '5 Stunden',
+            ],
+            'eval'      => ['tl_class' => 'w50'],
+            'sql'       => "varchar(2) NOT NULL default ''",
 
         ],
         'comment'    => [
@@ -164,10 +212,16 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'sorting'   => true,
             'flag'      => 1,
             'filter'    => true,
-            'eval'      => ['tl_class' => '', 'rte' => false, 'allowHtml' => true, 'rows' => 4, 'style' => 'height: 80px;'],
-            'sql'       => "text NOT NULL default ''"
-        ]
-    ]
+            'eval'      => [
+                'tl_class'  => '',
+                'rte'       => false,
+                'allowHtml' => true,
+                'rows'      => 4,
+                'style'     => 'height: 80px;',
+            ],
+            'sql'       => "mediumtext NULL",
+        ],
+    ],
 ];
 
 /**
@@ -182,28 +236,35 @@ class tl_rsz_praesenzkontrolle extends Contao\Backend
     /**
      * tl_rsz_praesenzkontrolle constructor.
      */
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
         $this->import('BackendUser', 'User');
 
-        if ($this->Input->get('act') === 'excelExport')
-        {
+        if ($this->Input->get('act') === 'excelExport') {
             $this->excelExport();
         }
+    }
+
+    /**
+     * Excel export
+     */
+    private function excelExport() {
+        $objExport = \Contao\System::getContainer()
+            ->get('Markocupic\RszPraesenzkontrolleBundle\Excel\RszPraesenzkontrolleDownload');
+        $objExport->excelExport();
     }
 
     /**
      * Onload callback
      * Modify data container array
      */
-    public function modifyDca()
-    {
-        if (!$this->User->isAdmin)
-        {
-            unset($GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['config']['notDeletable']);
+    public function modifyDca() {
+        if (!$this->User->isAdmin) {
+            $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['config']['closed'] = true;
+            $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['config']['notCopyable'] = true;
+            $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['config']['notDeletable'] = true;
+            unset($GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['list']['global_operations']);
             unset($GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['list']['operations']['delete']);
-            unset($GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['list']['global_operations']['all']);
         }
     }
 
@@ -211,29 +272,24 @@ class tl_rsz_praesenzkontrolle extends Contao\Backend
      * Onload callback
      * Create all events
      */
-    public function createAllEvents()
-    {
+    public function createAllEvents() {
         $db = $this->Database->execute('SELECT * FROM tl_rsz_jahresprogramm');
 
-        while ($db->next())
-        {
+        while ($db->next()) {
             $db2 = $this->Database
                 ->prepare('SELECT * FROM tl_rsz_praesenzkontrolle WHERE pid=?')
                 ->execute($db->id);
-            if (!$db2->numRows)
-            {
+            if (!$db2->numRows) {
                 $arrSet = [
                     'start_date' => $db->start_date,
                     'end_date'   => $db->end_date,
                     'event'      => $db->art,
-                    'pid'        => $db->id
+                    'pid'        => $db->id,
                 ];
                 $this->Database->prepare("INSERT INTO tl_rsz_praesenzkontrolle %s")
                     ->set($arrSet)
                     ->execute();
-            }
-            else
-            {
+            } else {
                 $arrSet = [
                     'start_date' => $db->start_date,
                     'end_date'   => $db->end_date,
@@ -250,17 +306,16 @@ class tl_rsz_praesenzkontrolle extends Contao\Backend
      * Return all athletes as array
      * @return array
      */
-    public function getAthletes()
-    {
+    public function getAthletes() {
         $db = $this->Database
-            ->prepare('SELECT id, name, niveau, trainingsgruppe FROM tl_user WHERE funktion LIKE ? ORDER BY ' . static::SORTING_DIRECTION_ATHLETES)
+            ->prepare('SELECT id, name, niveau, trainingsgruppe FROM tl_user WHERE funktion LIKE ? ORDER BY '.static::SORTING_DIRECTION_ATHLETES)
             ->execute('%Athlet%');
         $array = [];
-        while ($db->next())
-        {
-            $trainingGroup = $db->trainingsgruppe != '' ? 'Gr. ' . $db->trainingsgruppe : '';
+        while ($db->next()) {
+            $trainingGroup = $db->trainingsgruppe != '' ? 'Gr. '.$db->trainingsgruppe : '';
             $array[$db->id] = sprintf('%s [%s %s]', $db->name, $db->niveau, $trainingGroup);
         }
+
         return $array;
     }
 
@@ -269,25 +324,14 @@ class tl_rsz_praesenzkontrolle extends Contao\Backend
      * Return all trainers as array
      * @return array
      */
-    public function getTrainers()
-    {
+    public function getTrainers() {
         $db = $this->Database->prepare('SELECT id, name FROM tl_user WHERE funktion LIKE ?')->execute('%Trainer%');
         $array = [];
-        while ($db->next())
-        {
+        while ($db->next()) {
             $array[$db->id] = $db->name;
         }
-        return $array;
-    }
 
-    /**
-     * Excel export
-     */
-    private function excelExport()
-    {
-        $objExport = \Contao\System::getContainer()
-            ->get('Markocupic\RszPraesenzkontrolleBundle\Excel\RszPraesenzkontrolleDownload');
-        $objExport->excelExport();
+        return $array;
     }
 
     /**
@@ -296,15 +340,12 @@ class tl_rsz_praesenzkontrolle extends Contao\Backend
      * @param string
      * @return string
      */
-    public function labelCallback($row, $label)
-    {
+    public function labelCallback($row, $label) {
         $strTrainers = "";
-        if (count(\Contao\StringUtil::deserialize($row['trainers'], true)))
-        {
+        if (count(\Contao\StringUtil::deserialize($row['trainers'], true))) {
             $arrTrainer = [];
-            $objStmt = $this->Database->execute("SELECT username FROM tl_user WHERE id IN(" . implode(',', array_map('intval', unserialize($row['trainers']))) . ")");
-            while ($objStmt->next())
-            {
+            $objStmt = $this->Database->execute("SELECT username FROM tl_user WHERE id IN(".implode(',', array_map('intval', unserialize($row['trainers']))).")");
+            while ($objStmt->next()) {
                 $arrTrainer[] = $objStmt->username;
             }
             $strTrainers = implode(', ', $arrTrainer);
@@ -313,15 +354,13 @@ class tl_rsz_praesenzkontrolle extends Contao\Backend
         $label = str_replace('#TRAINERS#', $strTrainers, $label);
 
         $mysql = $this->Database->prepare('SELECT * FROM tl_rsz_praesenzkontrolle WHERE id=?')->execute($row['id']);
-        if (time() > $mysql->start_date)
-        {
+        if (time() > $mysql->start_date) {
             $status = '<div style="display:inline; padding-right:3px;"><img src="bundles/markocupicrszpraesenzkontrolle/check.svg" alt="history" title="abgelaufen"></div>';
-        }
-        else
-        {
+        } else {
             $status = '<div style="display:inline; padding-right:15px;">&nbsp;</div>';
         }
         $label = str_replace('#STATUS#', $status, $label);
+
         return $label;
     }
 
