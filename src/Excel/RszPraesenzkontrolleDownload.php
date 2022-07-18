@@ -17,6 +17,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
 use Contao\Date;
 use Contao\Input;
+use Contao\StringUtil;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -92,8 +93,11 @@ class RszPraesenzkontrolleDownload
         /** @var Database $databaseAdapter */
         $databaseAdapter = $this->framework->getAdapter(Database::class);
 
-        /** @var  $dateAdapter Date */
+        /** @var Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
+
+        /** @var StringUtil $stringUtilAdapter */
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
         // Trainer Datenarray erstellen
         $data_arr_trainer = [];
@@ -119,11 +123,7 @@ class RszPraesenzkontrolleDownload
         $db = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_rsz_praesenzkontrolle ORDER BY start_date');
         while ($db->next())
         {
-            $trainer_arr = [];
-            if (is_array(unserialize($db->trainers)))
-            {
-                $trainer_arr = unserialize($db->trainers);
-            }
+            $trainer_arr = $stringUtilAdapter->deserialize($db->trainers, true);
 
             foreach ($data_arr_trainer as $key => $username)
             {
@@ -139,11 +139,7 @@ class RszPraesenzkontrolleDownload
 
             // Hier wird geprüft, ob der Athlet am Anlass anwesend war oder nicht
             // und dann werden die entsprechenden Werte ins dataArr geschrieben
-            $athl_arr = [];
-            if (is_array(unserialize($db->athletes)))
-            {
-                $athl_arr = unserialize($db->athletes);
-            }
+            $athl_arr = $stringUtilAdapter->deserialize($db->athletes, true);
 
             foreach ($data_arr_athlete as $key => $username)
             {
@@ -187,7 +183,7 @@ class RszPraesenzkontrolleDownload
         $arrRow[] = '';
         foreach ($dateArr as $date)
         {
-            $arrRow[] = Date::parse('Y-m-d', $date);
+            $arrRow[] = $dateAdapter->parse('Y-m-d', $date);
         }
         $arrRows[] = $arrRow;
 
@@ -244,7 +240,7 @@ class RszPraesenzkontrolleDownload
         $arrRow[] = 'Bemerkungen';
         foreach ($eventComments as $eventComment)
         {
-            $arrRow[] = utf8_decode(Input::stripTags($eventComment));
+            $arrRow[] = utf8_decode((string)Input::stripTags($eventComment));
         }
         $arrRows[] = $arrRow;
 
