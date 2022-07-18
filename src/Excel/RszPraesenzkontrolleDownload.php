@@ -118,7 +118,7 @@ class RszPraesenzkontrolleDownload
             $trainer_arr = $stringUtilAdapter->deserialize($db->trainers, true);
 
             foreach (array_keys($data_arr_trainer) as $key) {
-                if (\in_array($key, $trainer_arr, true)) {
+                if (\in_array($key, $trainer_arr, false)) {
                     $data_arr_trainer[$key][$db->pid] = ['hours' => $db->hours, 'start_date' => $db->start_date, 'event' => $db->event];
                 } else {
                     $data_arr_trainer[$key][$db->pid] = ['hours' => '', 'start_date' => $db->start_date, 'event' => $db->event];
@@ -130,7 +130,7 @@ class RszPraesenzkontrolleDownload
             $athl_arr = $stringUtilAdapter->deserialize($db->athletes, true);
 
             foreach (array_keys($data_arr_athlete) as $key) {
-                if (\in_array($key, $athl_arr, true)) {
+                if (\in_array($key, $athl_arr, false)) {
                     $data_arr_athlete[$key][$db->pid] = ['hours' => $db->hours, 'start_date' => $db->start_date, 'event' => $db->event];
                 } else {
                     $data_arr_athlete[$key][$db->pid] = ['hours' => '', 'start_date' => $db->start_date, 'event' => $db->event];
@@ -222,7 +222,7 @@ class RszPraesenzkontrolleDownload
         $arrRow[] = 'Bemerkungen';
 
         foreach ($eventComments as $eventComment) {
-            $arrRow[] = utf8_decode((string) Input::stripTags($eventComment));
+            $arrRow[] = (string) Input::stripTags($eventComment);
         }
         $arrRows[] = $arrRow;
 
