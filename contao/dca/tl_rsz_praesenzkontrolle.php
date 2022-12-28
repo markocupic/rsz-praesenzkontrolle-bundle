@@ -12,18 +12,19 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/rsz-praesenzkontrolle-bundle
  */
 
+use Contao\CoreBundle\Exception\AccessDeniedException;
+use Contao\DC_Table;
+use Contao\DataContainer;
 use Contao\Backend;
 use Contao\StringUtil;
 use Contao\System;
-use PhpOffice\PhpSpreadsheet\Exception;
+use Markocupic\RszPraesenzkontrolleBundle\Security\RszPraesenzkontrollePermissions;
+use Markocupic\RszPraesenzkontrolleBundle\Excel\RszPraesenzkontrolleDownload;
 
-/*
- * Table tl_rsz_praesenzkontrolle
- */
 $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
     // Config
     'config'   => [
-        'dataContainer'    => 'Table',
+        'dataContainer'    => DC_Table::class,
         'pTable'           => 'tl_rsz_jahresprogramm',
         'enableVersioning' => true,
         'closed'           => false,
@@ -38,20 +39,20 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
         ],
         'onload_callback'  => [
             [
-                'tl_rsz_praesenzkontrolle',
+                tl_rsz_praesenzkontrolle::class,
                 'createAllEvents',
             ],
             [
-                'tl_rsz_praesenzkontrolle',
-                'modifyDca',
+                tl_rsz_praesenzkontrolle::class,
+                'checkPermissions',
             ],
         ],
     ],
     'list'     => [
         'sorting'           => [
-            'mode'            => 2,
+            'mode'            => DataContainer::MODE_SORTABLE,
             'fields'          => ['start_date'],
-            'flag'            => 1,
+            'flag'            => DataContainer::SORT_INITIAL_LETTER_ASC,
             'panelLayout'     => 'filter;sort,search,limit',
             'disableGrouping' => true,
         ],
@@ -61,10 +62,7 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
                 'event',
             ],
             'format'         => '<span>#STATUS# %s [%s]&nbsp;&nbsp;&nbsp;Trainer: #TRAINERS#</span>',
-            'label_callback' => [
-                'tl_rsz_praesenzkontrolle',
-                'labelCallback',
-            ],
+            'label_callback' => [tl_rsz_praesenzkontrolle::class, 'labelCallback'],
         ],
         'global_operations' => [
             'all'         => [
@@ -85,18 +83,19 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'edit'   => [
                 'label' => &$GLOBALS['TL_LANG']['tl_rsz_praesenzkontrolle']['edit'],
                 'href'  => 'act=edit',
-                'icon'  => 'edit.gif',
+                'icon'  => 'edit.svg',
             ],
             'delete' => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_rsz_praesenzkontrolle']['delete'],
-                'href'       => 'act=delete',
-                'icon'       => 'delete.gif',
-                'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
+                'label'           => &$GLOBALS['TL_LANG']['tl_rsz_praesenzkontrolle']['delete'],
+                'href'            => 'act=delete',
+                'icon'            => 'delete.svg',
+                'attributes'      => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
+                'button_callback' => ['tl_rsz_praesenzkontrolle', 'deleteElement'],
             ],
             'show'   => [
                 'label'      => &$GLOBALS['TL_LANG']['tl_rsz_praesenzkontrolle']['show'],
                 'href'       => 'act=show',
-                'icon'       => 'show.gif',
+                'icon'       => 'show.svg',
                 'attributes' => 'style="margin-right:3px"',
             ],
         ],
@@ -113,10 +112,7 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
         'pid'        => [
             'foreignKey' => 'tl_rsz_jahresprogramm.id',
             'sql'        => "int(10) unsigned NOT NULL default '0'",
-            'relation'   => [
-                'type' => 'belongsTo',
-                'load' => 'lazy',
-            ],
+            'relation'   => ['type' => 'belongsTo', 'load' => 'lazy'],
         ],
         'tstamp'     => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
@@ -126,14 +122,8 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'inputType' => 'text',
             'search'    => true,
             'sorting'   => true,
-            'flag'      => 5,
-            'eval'      => [
-                'readonly'   => true,
-                'mandatory'  => true,
-                'datepicker' => false,
-                'rgxp'       => 'date',
-                'tl_class'   => 'w50',
-            ],
+            'flag'      => DataContainer::SORT_DAY_ASC,
+            'eval'      => ['readonly' => true, 'mandatory' => true, 'datepicker' => false, 'rgxp' => 'date', 'tl_class' => 'w50'],
             'sql'       => "int(10) unsigned NOT NULL default '0'",
         ],
         'end_date'   => [
@@ -141,14 +131,8 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'inputType' => 'text',
             'search'    => true,
             'sorting'   => true,
-            'flag'      => 5,
-            'eval'      => [
-                'readonly'   => true,
-                'mandatory'  => true,
-                'datepicker' => false,
-                'rgxp'       => 'date',
-                'tl_class'   => 'w50',
-            ],
+            'flag'      => DataContainer::SORT_DAY_ASC,
+            'eval'      => ['readonly' => true, 'mandatory' => true, 'datepicker' => false, 'rgxp' => 'date', 'tl_class' => 'w50'],
             'sql'       => "int(10) unsigned NOT NULL default '0'",
         ],
         'event'      => [
@@ -157,11 +141,7 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'search'    => true,
             'filter'    => true,
             'sorting'   => true,
-            'eval'      => [
-                'readonly'  => true,
-                'mandatory' => true,
-                'tl_class'  => 'w50',
-            ],
+            'eval'      => ['readonly' => true, 'mandatory' => true, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'trainers'   => [
@@ -169,15 +149,9 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'inputType'        => 'checkbox',
             'search'           => true,
             'sorting'          => true,
-            'flag'             => 1,
-            'options_callback' => [
-                'tl_rsz_praesenzkontrolle',
-                'getTrainers',
-            ],
-            'eval'             => [
-                'multiple' => true,
-                'tl_class' => '',
-            ],
+            'flag'             => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'options_callback' => [tl_rsz_praesenzkontrolle::class, 'getTrainers',],
+            'eval'             => ['multiple' => true, 'tl_class' => ''],
             'sql'              => 'blob NULL',
         ],
         'athletes'   => [
@@ -185,15 +159,9 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'inputType'        => 'checkbox',
             'search'           => true,
             'sorting'          => true,
-            'flag'             => 1,
-            'options_callback' => [
-                'tl_rsz_praesenzkontrolle',
-                'getAthletes',
-            ],
-            'eval'             => [
-                'multiple' => true,
-                'tl_class' => '',
-            ],
+            'flag'             => DataContainer::SORT_INITIAL_LETTER_ASC,
+            'options_callback' => [tl_rsz_praesenzkontrolle::class, 'getAthletes'],
+            'eval'             => ['multiple' => true, 'tl_class' => ''],
             'sql'              => 'blob NULL',
         ],
         'hours'      => [
@@ -202,37 +170,27 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'search'    => true,
             'sorting'   => true,
             'filter'    => true,
-            'flag'      => 1,
-            'default'   => '3',
+            'flag'      => DataContainer::SORT_INITIAL_LETTER_ASC,
             'options'   => [
                 '3' => '3 Stunden',
                 '5' => '5 Stunden',
             ],
             'eval'      => ['tl_class' => 'w50'],
-            'sql'       => "varchar(2) NOT NULL default ''",
+            'sql'       => "varchar(2) NOT NULL default '3'",
         ],
         'comment'    => [
             'inputType' => 'textarea',
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
-            'flag'      => 1,
+            'flag'      => DataContainer::SORT_INITIAL_LETTER_ASC,
             'filter'    => true,
-            'eval'      => [
-                'tl_class'  => '',
-                'rte'       => false,
-                'allowHtml' => true,
-                'rows'      => 4,
-                'style'     => 'height: 80px;',
-            ],
+            'eval'      => ['tl_class' => '', 'rte' => false, 'allowHtml' => true, 'rows' => 4, 'style' => 'height: 80px;'],
             'sql'       => 'mediumtext NULL',
         ],
     ],
 ];
 
-/**
- * Class tl_rsz_praesenzkontrolle.
- */
 class tl_rsz_praesenzkontrolle extends Backend
 {
     private const SORTING_DIRECTION_ATHLETES = 'name ASC';
@@ -251,28 +209,69 @@ class tl_rsz_praesenzkontrolle extends Backend
     }
 
     /**
-     * Excel export.
-     *
-     * @throws Exception
+     * Excel export
      */
     private function excelExport(): void
     {
-        $objExport = System::getContainer()
-            ->get('Markocupic\RszPraesenzkontrolleBundle\Excel\RszPraesenzkontrolleDownload');
-        $objExport->excelExport();
+
+        $security = System::getContainer()->get('security.helper');
+
+        if ($this->User->isAdmin || $security->isGranted(RszPraesenzkontrollePermissions::USER_CAN_EXPORT_RSZ_PRAESENZKONTROLLE)) {
+            $objExport = System::getContainer()->get(RszPraesenzkontrolleDownload::class);
+            $objExport->excelExport();
+        }
+
+        throw new AccessDeniedException('Not enough permissions to export tl_praesenzkontrolle.');
+
     }
 
     /**
      * Onload callback
      * Modify data container array.
      */
-    public function modifyDca(): void
+    public function checkPermissions(): void
     {
-        if (!$this->User->isAdmin) {
-            $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['config']['closed'] = true;
-            $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['config']['notCopyable'] = true;
-            $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['config']['notDeletable'] = true;
-            unset($GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['list']['global_operations'], $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['list']['operations']['delete']);
+        if ($this->User->isAdmin) {
+            return;
+        }
+
+        $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['config']['closed'] = true;
+        $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['config']['notCopyable'] = true;
+        $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['config']['notDeletable'] = true;
+
+        /** @var \Symfony\Component\Security\Core\Security $security */
+        $security = System::getContainer()->get('security.helper');
+
+        $granted = $security->isGranted(RszPraesenzkontrollePermissions::USER_CAN_EXPORT_RSZ_PRAESENZKONTROLLE);
+
+        if (!$granted) {
+            unset($GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['list']['global_operations']['excelExport']);
+        }
+
+        // Check current action
+        if (Input::get('act') && Input::get('act') != 'paste') {
+            $permission = null;
+
+            // Set permission
+            switch (Input::get('act')) {
+                case 'edit':
+                case 'toggle':
+                case 'move':
+                case 'create':
+                case 'copy':
+                case 'copyAll':
+                case 'cut':
+                case 'cutAll':
+                    break;
+
+                case 'delete':
+                    $permission = RszPraesenzkontrollePermissions::USER_CAN_DELETE_ITEMS_IN_RSZ_PRAESENZKONTROLLE;
+                    if (!$security->isGranted($permission)) {
+                        throw new AccessDeniedException('Not enough permissions to delete items.');
+                    }
+
+                    break;
+            }
         }
     }
 
@@ -304,6 +303,34 @@ class tl_rsz_praesenzkontrolle extends Backend
                 $this->Database->prepare('UPDATE tl_rsz_praesenzkontrolle %s WHERE pid=?')->set($arrSet)->execute($db->id);
             }
         }
+    }
+
+    /**
+     * Return the delete content element button
+     *
+     * @param array $row
+     * @param string $href
+     * @param string $label
+     * @param string $title
+     * @param string $icon
+     * @param string $attributes
+     *
+     * @return string
+     */
+    public function deleteElement($row, $href, $label, $title, $icon, $attributes)
+    {
+        $granted = false;
+
+        if ($this->User->isAdmin) {
+            $granted = true;
+        }
+
+        // Disable the button if the element type is not allowed
+        if (System::getContainer()->get('security.helper')->isGranted(RszPraesenzkontrollePermissions::USER_CAN_DELETE_ITEMS_IN_RSZ_PRAESENZKONTROLLE)) {
+            $granted = true;
+        }
+
+        return $granted === false ? Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)).' ' : '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
     }
 
     /**

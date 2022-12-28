@@ -18,3 +18,8 @@ declare(strict_types=1);
 $GLOBALS['BE_MOD']['rsz_tools']['rsz_praesenzkontrolle'] = [
     'tables' => ['tl_rsz_praesenzkontrolle'],
 ];
+
+/**
+ * Add permissions
+ */
+$GLOBALS['TL_PERMISSIONS'][] = 'rsz_praesenzkontrollep';

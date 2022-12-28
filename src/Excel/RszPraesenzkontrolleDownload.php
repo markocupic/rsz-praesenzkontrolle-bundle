@@ -33,8 +33,8 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class RszPraesenzkontrolleDownload
 {
-    private ContaoFramework $framework;
     protected array $opt;
+    private ContaoFramework $framework;
 
     public function __construct(ContaoFramework $framework)
     {

@@ -12,14 +12,10 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/rsz-praesenzkontrolle-bundle
  */
 
-namespace Markocupic\RszPraesenzkontrolleBundle;
+namespace Markocupic\RszPraesenzkontrolleBundle\Security;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-class MarkocupicRszPraesenzkontrolleBundle extends Bundle
+final class RszPraesenzkontrollePermissions
 {
-    public function getPath(): string
-    {
-        return \dirname(__DIR__);
-    }
+    public const USER_CAN_EXPORT_RSZ_PRAESENZKONTROLLE = 'rsz_praesenzkontrolle_permission.export';
+    public const USER_CAN_DELETE_ITEMS_IN_RSZ_PRAESENZKONTROLLE = 'rsz_praesenzkontrolle_permission.delete_items';
 }

@@ -12,14 +12,12 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/rsz-praesenzkontrolle-bundle
  */
 
-namespace Markocupic\RszPraesenzkontrolleBundle;
+/**
+ * Legends
+ */
+$GLOBALS['TL_LANG']['tl_user_group']['rsz_praesenzkontrolle_legend'] = 'RSZ Präsenzkontrolle';
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-class MarkocupicRszPraesenzkontrolleBundle extends Bundle
-{
-    public function getPath(): string
-    {
-        return \dirname(__DIR__);
-    }
-}
+/**
+ * Fields
+ */
+$GLOBALS['TL_LANG']['tl_user_group']['rsz_praesenzkontrollep'] = ["RSZ-Präsenzkontrolle-Rechte", "Hier können Sie die RSZ-Präsenzkontrolle-Rechte festlegen."];

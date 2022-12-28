@@ -12,14 +12,8 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/rsz-praesenzkontrolle-bundle
  */
 
-namespace Markocupic\RszPraesenzkontrolleBundle;
-
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-class MarkocupicRszPraesenzkontrolleBundle extends Bundle
-{
-    public function getPath(): string
-    {
-        return \dirname(__DIR__);
-    }
-}
+/**
+ * References
+ */
+$GLOBALS['TL_LANG']['MSC']['rsz_praesenzkontrolle']['delete_items'] = 'Anlässe löschen';
+$GLOBALS['TL_LANG']['MSC']['rsz_praesenzkontrolle']['export'] = 'Excel-Export';
