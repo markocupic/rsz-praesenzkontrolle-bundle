@@ -238,13 +238,15 @@ class tl_rsz_praesenzkontrolle extends Backend
             return;
         }
 
+        /** New items are generated automatically from tl_rsz_jahresprogramm */
         $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['config']['closed'] = true;
         $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['config']['notCopyable'] = true;
-        $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['config']['notDeletable'] = true;
 
-        $granted = $security->isGranted(RszPraesenzkontrollePermissions::USER_CAN_PERFORM_OPERATION, 'export');
+        if (!$security->isGranted(RszPraesenzkontrollePermissions::USER_CAN_PERFORM_OPERATION, 'delete')) {
+            $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['config']['notDeletable'] = true;
+        }
 
-        if (!$granted) {
+        if (!$security->isGranted(RszPraesenzkontrollePermissions::USER_CAN_PERFORM_OPERATION, 'export')) {
             unset($GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['list']['global_operations']['excelExport']);
         }
 
