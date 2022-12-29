@@ -25,7 +25,7 @@ PaletteManipulator::create()
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['rsz_praesenzkontrollep'] = [
     'exclude'   => true,
     'inputType' => 'checkbox',
-    'options'   => ['export', 'delete_items'],
+    'options'   => ['export', 'delete'],
     'reference' => &$GLOBALS['TL_LANG']['MSC']['rsz_praesenzkontrolle'],
     'eval'      => ['multiple' => true],
     'sql'       => "blob NULL",

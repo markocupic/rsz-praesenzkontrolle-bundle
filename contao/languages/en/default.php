@@ -15,5 +15,5 @@ declare(strict_types=1);
 /**
  * References
  */
-$GLOBALS['TL_LANG']['MSC']['rsz_praesenzkontrolle']['delete_items'] = 'Anlässe löschen';
+$GLOBALS['TL_LANG']['MSC']['rsz_praesenzkontrolle']['delete'] = 'Anlässe löschen';
 $GLOBALS['TL_LANG']['MSC']['rsz_praesenzkontrolle']['export'] = 'Excel-Export';

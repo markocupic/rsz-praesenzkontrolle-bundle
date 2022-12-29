@@ -21,15 +21,16 @@ declare(strict_types=1);
 
 namespace Markocupic\RszPraesenzkontrolleBundle\Excel;
 
+use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
 use Contao\Date;
 use Contao\Input;
 use Contao\StringUtil;
-use JetBrains\PhpStorm\NoReturn;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\Response;
 
 class RszPraesenzkontrolleDownload
 {
@@ -46,40 +47,43 @@ class RszPraesenzkontrolleDownload
 
     /**
      * @throws Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    #[NoReturn]
- public function excelExport(): void
- {
-     /** @var Date $dateAdapter */
-     $dateAdapter = $this->framework->getAdapter(Date::class);
+    public function excelExport(): Response
+    {
+        /** @var Date $dateAdapter */
+        $dateAdapter = $this->framework->getAdapter(Date::class);
 
-     // Get data
-     $arrData = $this->prepareData();
+        // Get data
+        $arrData = $this->prepareData();
 
-     $spreadsheet = new Spreadsheet();
-     $spreadsheet->getActiveSheet()->setTitle('Präsenzkontrolle '.$dateAdapter->parse('Y'));
-     $spreadsheet->setActiveSheetIndex(0);
+        $spreadsheet = new Spreadsheet();
+        $spreadsheet->getActiveSheet()->setTitle('Präsenzkontrolle '.$dateAdapter->parse('Y'));
+        $spreadsheet->setActiveSheetIndex(0);
 
-     foreach ($arrData as $intRow => $arrRow) {
-         foreach ($arrRow as $intColumn => $strValue) {
-             $spreadsheet->getActiveSheet()->setCellValueByColumnAndRow($intColumn + 1, $intRow + 1, $strValue);
-         }
-     }
+        foreach ($arrData as $intRow => $arrRow) {
+            foreach ($arrRow as $intColumn => $strValue) {
+                $spreadsheet->getActiveSheet()->setCellValueByColumnAndRow($intColumn + 1, $intRow + 1, $strValue);
+            }
+        }
 
-     // Set Text Rotation to top row
-     $spreadsheet->getActiveSheet()->getStyle('A1:ZZ1')->getAlignment()->setTextRotation(90);
+        // Set Text Rotation to top row
+        $spreadsheet->getActiveSheet()->getStyle('A1:ZZ1')->getAlignment()->setTextRotation(90);
 
-     // Set height of top row
-     $spreadsheet->getActiveSheet()->getRowDimension(1)->setRowHeight(75);
+        // Set height of top row
+        $spreadsheet->getActiveSheet()->getRowDimension(1)->setRowHeight(75);
 
-     // Send file to browser
-     $objWriter = new Xlsx($spreadsheet);
-     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-     header('Content-Disposition: attachment; filename="praesenzkontrolle_rsz_'.$dateAdapter->parse('Y-m-d').'.xlsx"');
-     header('Cache-Control: max-age=0');
-     $objWriter->save('php://output');
-     exit;
- }
+        // Send file to browser
+        $objWriter = new Xlsx($spreadsheet);
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="praesenzkontrolle_rsz_'.$dateAdapter->parse('Y-m-d').'.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        return throw new ResponseException(
+            new Response($objWriter->save('php://output')
+            )
+        );
+    }
 
     private function prepareData(): array
     {

@@ -213,10 +213,10 @@ class tl_rsz_praesenzkontrolle extends Backend
      */
     private function excelExport(): void
     {
-
+        /** @var \Symfony\Component\Security\Core\Security $security */
         $security = System::getContainer()->get('security.helper');
 
-        if ($this->User->isAdmin || $security->isGranted(RszPraesenzkontrollePermissions::USER_CAN_EXPORT_RSZ_PRAESENZKONTROLLE)) {
+        if ($security->isGranted('ROLE_ADMIN') || $security->isGranted(RszPraesenzkontrollePermissions::USER_CAN_PERFORM_OPERATION, 'export')) {
             $objExport = System::getContainer()->get(RszPraesenzkontrolleDownload::class);
             $objExport->excelExport();
         }
@@ -231,7 +231,10 @@ class tl_rsz_praesenzkontrolle extends Backend
      */
     public function checkPermissions(): void
     {
-        if ($this->User->isAdmin) {
+        /** @var \Symfony\Component\Security\Core\Security $security */
+        $security = System::getContainer()->get('security.helper');
+
+        if ($security->isGranted('ROLE_ADMIN')) {
             return;
         }
 
@@ -239,18 +242,14 @@ class tl_rsz_praesenzkontrolle extends Backend
         $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['config']['notCopyable'] = true;
         $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['config']['notDeletable'] = true;
 
-        /** @var \Symfony\Component\Security\Core\Security $security */
-        $security = System::getContainer()->get('security.helper');
-
-        $granted = $security->isGranted(RszPraesenzkontrollePermissions::USER_CAN_EXPORT_RSZ_PRAESENZKONTROLLE);
+        $granted = $security->isGranted(RszPraesenzkontrollePermissions::USER_CAN_PERFORM_OPERATION, 'export');
 
         if (!$granted) {
             unset($GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['list']['global_operations']['excelExport']);
         }
 
         // Check current action
-        if (Input::get('act') && Input::get('act') != 'paste') {
-            $permission = null;
+        if (Input::get('act') && Input::get('act') !== 'paste') {
 
             // Set permission
             switch (Input::get('act')) {
@@ -265,8 +264,7 @@ class tl_rsz_praesenzkontrolle extends Backend
                     break;
 
                 case 'delete':
-                    $permission = RszPraesenzkontrollePermissions::USER_CAN_DELETE_ITEMS_IN_RSZ_PRAESENZKONTROLLE;
-                    if (!$security->isGranted($permission)) {
+                    if (!$security->isGranted(RszPraesenzkontrollePermissions::USER_CAN_PERFORM_OPERATION, 'delete')) {
                         throw new AccessDeniedException('Not enough permissions to delete items.');
                     }
 
@@ -319,18 +317,21 @@ class tl_rsz_praesenzkontrolle extends Backend
      */
     public function deleteElement($row, $href, $label, $title, $icon, $attributes)
     {
+        /** @var \Symfony\Component\Security\Core\Security $security */
+        $security = System::getContainer()->get('security.helper');
+
         $granted = false;
 
-        if ($this->User->isAdmin) {
+        if ($security->isGranted('ROLE_ADMIN')) {
             $granted = true;
         }
 
         // Disable the button if the element type is not allowed
-        if (System::getContainer()->get('security.helper')->isGranted(RszPraesenzkontrollePermissions::USER_CAN_DELETE_ITEMS_IN_RSZ_PRAESENZKONTROLLE)) {
+        if ($security->isGranted(RszPraesenzkontrollePermissions::USER_CAN_PERFORM_OPERATION, 'delete')) {
             $granted = true;
         }
 
-        return $granted === false ? Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)).' ' : '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+        return !$granted ? Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)).' ' : '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
     }
 
     /**

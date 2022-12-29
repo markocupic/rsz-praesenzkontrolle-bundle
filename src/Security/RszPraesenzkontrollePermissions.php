@@ -16,6 +16,9 @@ namespace Markocupic\RszPraesenzkontrolleBundle\Security;
 
 final class RszPraesenzkontrollePermissions
 {
-    public const USER_CAN_EXPORT_RSZ_PRAESENZKONTROLLE = 'rsz_praesenzkontrolle_permission.export';
-    public const USER_CAN_DELETE_ITEMS_IN_RSZ_PRAESENZKONTROLLE = 'rsz_praesenzkontrolle_permission.delete_items';
+    /**
+     * Access is granted if the current user can perform an operation on tl_rsz_praesenzkontrolle.
+     * Subject must be an operation: Either delete or export.
+     */
+    public const USER_CAN_PERFORM_OPERATION = 'contao_user.rsz_praesenzkontrollep';
 }
