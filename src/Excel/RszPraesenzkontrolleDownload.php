@@ -21,7 +21,6 @@ declare(strict_types=1);
 
 namespace Markocupic\RszPraesenzkontrolleBundle\Excel;
 
-use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
 use Contao\Date;
@@ -31,6 +30,7 @@ use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class RszPraesenzkontrolleDownload
 {
@@ -74,15 +74,19 @@ class RszPraesenzkontrolleDownload
         $spreadsheet->getActiveSheet()->getRowDimension(1)->setRowHeight(75);
 
         // Send file to browser
-        $objWriter = new Xlsx($spreadsheet);
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="praesenzkontrolle_rsz_'.$dateAdapter->parse('Y-m-d').'.xlsx"');
-        header('Cache-Control: max-age=0');
+        $writer = new Xlsx($spreadsheet);
 
-        return throw new ResponseException(
-            new Response($objWriter->save('php://output')
-            )
+        $response =  new StreamedResponse(
+            function () use ($writer) {
+                $writer->save('php://output');
+            }
         );
+
+        $response->headers->set('Content-Type', 'application/vnd.ms-excel');
+        $response->headers->set('Content-Disposition', 'attachment;filename="praesenzkontrolle_rsz_'.$dateAdapter->parse('Y-m-d').'.xlsx"');
+        $response->headers->set('Cache-Control','max-age=0');
+
+        return $response->send();
     }
 
     private function prepareData(): array

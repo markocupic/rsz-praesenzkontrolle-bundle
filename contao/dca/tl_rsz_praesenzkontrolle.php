@@ -150,7 +150,7 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'search'           => true,
             'sorting'          => true,
             'flag'             => DataContainer::SORT_INITIAL_LETTER_ASC,
-            'options_callback' => [tl_rsz_praesenzkontrolle::class, 'getTrainers',],
+            'options_callback' => [tl_rsz_praesenzkontrolle::class, 'getTrainers'],
             'eval'             => ['multiple' => true, 'tl_class' => ''],
             'sql'              => 'blob NULL',
         ],
