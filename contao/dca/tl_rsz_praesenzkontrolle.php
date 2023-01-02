@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of RSZ Präsenzkontrolle Bundle.
  *
- * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -19,7 +19,6 @@ use Contao\Backend;
 use Contao\StringUtil;
 use Contao\System;
 use Markocupic\RszPraesenzkontrolleBundle\Security\RszPraesenzkontrollePermissions;
-use Markocupic\RszPraesenzkontrolleBundle\Excel\RszPraesenzkontrolleDownload;
 
 $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
     // Config
@@ -65,15 +64,15 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             'label_callback' => [tl_rsz_praesenzkontrolle::class, 'labelCallback'],
         ],
         'global_operations' => [
-            'all'         => [
+            'all'      => [
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'       => 'act=select',
                 'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
-            'excelExport' => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_rsz_praesenzkontrolle']['excelExport'],
-                'href'       => 'act=excelExport',
+            'download' => [
+                'label'      => &$GLOBALS['TL_LANG']['tl_rsz_praesenzkontrolle']['download'],
+                'route'      => 'markocupic_rsz_praesenzkontrolle_download',
                 'class'      => 'header_icon',
                 'icon'       => 'bundles/markocupicrszpraesenzkontrolle/excel.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset();" accesskey="i"',
@@ -195,34 +194,10 @@ class tl_rsz_praesenzkontrolle extends Backend
 {
     private const SORTING_DIRECTION_ATHLETES = 'name ASC';
 
-    /**
-     * tl_rsz_praesenzkontrolle constructor.
-     */
     public function __construct()
     {
         parent::__construct();
         $this->import('BackendUser', 'User');
-
-        if ('excelExport' === $this->Input->get('act')) {
-            $this->excelExport();
-        }
-    }
-
-    /**
-     * Excel export
-     */
-    private function excelExport(): void
-    {
-        /** @var \Symfony\Component\Security\Core\Security $security */
-        $security = System::getContainer()->get('security.helper');
-
-        if ($security->isGranted('ROLE_ADMIN') || $security->isGranted(RszPraesenzkontrollePermissions::USER_CAN_PERFORM_OPERATION, 'export')) {
-            $objExport = System::getContainer()->get(RszPraesenzkontrolleDownload::class);
-            $objExport->excelExport();
-        }
-
-        throw new AccessDeniedException('Not enough permissions to export tl_praesenzkontrolle.');
-
     }
 
     /**
@@ -246,8 +221,8 @@ class tl_rsz_praesenzkontrolle extends Backend
             $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['config']['notDeletable'] = true;
         }
 
-        if (!$security->isGranted(RszPraesenzkontrollePermissions::USER_CAN_PERFORM_OPERATION, 'export')) {
-            unset($GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['list']['global_operations']['excelExport']);
+        if (!$security->isGranted(RszPraesenzkontrollePermissions::USER_CAN_PERFORM_OPERATION, 'download')) {
+            unset($GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle']['list']['global_operations']['download']);
         }
 
         // Check current action
@@ -307,17 +282,8 @@ class tl_rsz_praesenzkontrolle extends Backend
 
     /**
      * Return the delete content element button
-     *
-     * @param array $row
-     * @param string $href
-     * @param string $label
-     * @param string $title
-     * @param string $icon
-     * @param string $attributes
-     *
-     * @return string
      */
-    public function deleteElement($row, $href, $label, $title, $icon, $attributes)
+    public function deleteElement(array $row, string $href, string $label, string $title, string $icon, string $attributes): string
     {
         /** @var \Symfony\Component\Security\Core\Security $security */
         $security = System::getContainer()->get('security.helper');

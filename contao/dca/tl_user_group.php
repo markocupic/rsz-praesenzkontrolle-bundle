@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of RSZ Präsenzkontrolle Bundle.
  *
- * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -25,7 +25,7 @@ PaletteManipulator::create()
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['rsz_praesenzkontrollep'] = [
     'exclude'   => true,
     'inputType' => 'checkbox',
-    'options'   => ['export', 'delete'],
+    'options'   => ['download', 'delete'],
     'reference' => &$GLOBALS['TL_LANG']['MSC']['rsz_praesenzkontrolle'],
     'eval'      => ['multiple' => true],
     'sql'       => "blob NULL",

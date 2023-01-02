@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright  Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @copyright  Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license    MIT
  *
  * @see        https://github.com/markocupic/rsz-benutzerverwaltung-bundle
@@ -12,7 +12,7 @@ declare(strict_types=1);
 /*
  * This file is part of RSZ Präsenzkontrolle Bundle.
  *
- * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license MIT
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -49,7 +49,7 @@ class RszPraesenzkontrolleDownload
      * @throws Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function excelExport(): Response
+    public function download(): Response
     {
         /** @var Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
@@ -63,7 +63,7 @@ class RszPraesenzkontrolleDownload
 
         foreach ($arrData as $intRow => $arrRow) {
             foreach ($arrRow as $intColumn => $strValue) {
-                $spreadsheet->getActiveSheet()->setCellValueByColumnAndRow($intColumn + 1, $intRow + 1, $strValue);
+                $spreadsheet->getActiveSheet()->setCellValue([$intColumn + 1, $intRow + 1], $strValue);
             }
         }
 
@@ -76,15 +76,15 @@ class RszPraesenzkontrolleDownload
         // Send file to browser
         $writer = new Xlsx($spreadsheet);
 
-        $response =  new StreamedResponse(
-            function () use ($writer) {
+        $response = new StreamedResponse(
+            static function () use ($writer): void {
                 $writer->save('php://output');
             }
         );
 
         $response->headers->set('Content-Type', 'application/vnd.ms-excel');
         $response->headers->set('Content-Disposition', 'attachment;filename="praesenzkontrolle_rsz_'.$dateAdapter->parse('Y-m-d').'.xlsx"');
-        $response->headers->set('Cache-Control','max-age=0');
+        $response->headers->set('Cache-Control', 'max-age=0');
 
         return $response->send();
     }
@@ -145,6 +145,7 @@ class RszPraesenzkontrolleDownload
                 }
             }
         }
+
         // Hilfsarrays mit dem
         // Datum aller Anlässe für die erste Zeile
         // und mir der pid (id) von jedem Anlass
@@ -159,7 +160,7 @@ class RszPraesenzkontrolleDownload
             $eventComments[] = $db->comment;
         }
 
-        // Hilfsarrays mit den Eventdaten
+        // Hilfsarrays mit den Event-Daten
         $eventArr = [];
 
         foreach ($eventId as $id) {
@@ -171,6 +172,7 @@ class RszPraesenzkontrolleDownload
 
         // 1. Zeile mit Eventdatum
         $arrRow = [];
+
         // Leerzelle
         $arrRow[] = '';
 
@@ -181,6 +183,7 @@ class RszPraesenzkontrolleDownload
 
         // 2. Zeile Event-Art des Events/Trainings
         $arrRow = [];
+
         // Leerzelle
         $arrRow[] = '';
 
@@ -194,6 +197,7 @@ class RszPraesenzkontrolleDownload
 
         // Eine Leerzeile mit Übertitel "Trainer"
         $arrRows[] = ['Trainer'];
+
         // Zeilen mit den Trainern
         foreach (array_keys($data_arr_trainer) as $key) {
             $arrRow = [];

@@ -1,0 +1,3 @@
+contao:
+    resource: '@MarkocupicRszPraesenzkontrolleBundle/src/Controller'
+    type: annotation
