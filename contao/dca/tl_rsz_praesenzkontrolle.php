@@ -268,6 +268,7 @@ class tl_rsz_praesenzkontrolle extends Backend
                 'end_date'   => $db->end_date,
                 'event'      => $db->art,
                 'pid'        => $db->id,
+                'tstamp'     => time(),
             ];
 
             if (!$db2->numRows) {
