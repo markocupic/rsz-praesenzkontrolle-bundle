@@ -1,6 +1,4 @@
-![Alt text](docs/logo.png?raw=true "logo")
 ![Alt text](docs/rsz-logo.png?raw=true "Regionalzentrum Sportklettern Zentralschweiz")
-
 
 # RSZ Präsenzkontrolle
 
