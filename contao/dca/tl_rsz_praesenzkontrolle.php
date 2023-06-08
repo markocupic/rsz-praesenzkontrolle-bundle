@@ -12,16 +12,17 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/rsz-praesenzkontrolle-bundle
  */
 
+use Contao\Backend;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\DC_Table;
 use Contao\DataContainer;
-use Contao\Backend;
+use Contao\Image;
+use Contao\Input;
 use Contao\StringUtil;
 use Contao\System;
 use Markocupic\RszPraesenzkontrolleBundle\Security\RszPraesenzkontrollePermissions;
 
 $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
-    // Config
     'config'   => [
         'dataContainer'    => DC_Table::class,
         'pTable'           => 'tl_rsz_jahresprogramm',
@@ -99,11 +100,9 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
             ],
         ],
     ],
-    // Palettes
     'palettes' => [
         'default' => '{event_legend},start_date,end_date,event,hours;{participants},athletes,trainers;{Kommentar zum Training},comment',
     ],
-    // Fields
     'fields'   => [
         'id'         => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
@@ -193,12 +192,6 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
 class tl_rsz_praesenzkontrolle extends Backend
 {
     private const SORTING_DIRECTION_ATHLETES = 'name ASC';
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->import('BackendUser', 'User');
-    }
 
     /**
      * Onload callback
@@ -310,8 +303,8 @@ class tl_rsz_praesenzkontrolle extends Backend
     public function getAthletes(): array
     {
         $db = $this->Database
-            ->prepare('SELECT id, name, niveau, trainingsgruppe FROM tl_user WHERE funktion LIKE ? ORDER BY '.static::SORTING_DIRECTION_ATHLETES)
-            ->execute('%Athlet%');
+            ->prepare('SELECT id, name, niveau, trainingsgruppe FROM tl_user WHERE disable = ? AND funktion LIKE ? ORDER BY '.static::SORTING_DIRECTION_ATHLETES)
+            ->execute('', '%Athlet%');
         $array = [];
 
         while ($db->next()) {
@@ -328,7 +321,9 @@ class tl_rsz_praesenzkontrolle extends Backend
      */
     public function getTrainers(): array
     {
-        $db = $this->Database->prepare('SELECT id, name FROM tl_user WHERE funktion LIKE ?')->execute('%Trainer%');
+        $db = $this->Database
+            ->prepare('SELECT id, name FROM tl_user WHERE disable = ? AND funktion LIKE ?')
+            ->execute('', '%Trainer%');
         $array = [];
 
         while ($db->next()) {
