@@ -89,7 +89,7 @@ $GLOBALS['TL_DCA']['tl_rsz_praesenzkontrolle'] = [
                 'label'           => &$GLOBALS['TL_LANG']['tl_rsz_praesenzkontrolle']['delete'],
                 'href'            => 'act=delete',
                 'icon'            => 'delete.svg',
-                'attributes'      => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
+                'attributes'      => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()"',
                 'button_callback' => ['tl_rsz_praesenzkontrolle', 'deleteElement'],
             ],
             'show'   => [
@@ -199,7 +199,7 @@ class tl_rsz_praesenzkontrolle extends Backend
      */
     public function checkPermissions(): void
     {
-        /** @var \Symfony\Component\Security\Core\Security $security */
+        /** @var \Symfony\Bundle\SecurityBundle\Security $security */
         $security = System::getContainer()->get('security.helper');
 
         if ($security->isGranted('ROLE_ADMIN')) {
@@ -279,7 +279,7 @@ class tl_rsz_praesenzkontrolle extends Backend
      */
     public function deleteElement(array $row, string $href, string $label, string $title, string $icon, string $attributes): string
     {
-        /** @var \Symfony\Component\Security\Core\Security $security */
+        /** @var \Symfony\Bundle\SecurityBundle\Security $security */
         $security = System::getContainer()->get('security.helper');
 
         $granted = false;

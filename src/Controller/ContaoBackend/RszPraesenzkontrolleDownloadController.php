@@ -20,7 +20,7 @@ use Markocupic\RszPraesenzkontrolleBundle\Security\RszPraesenzkontrollePermissio
 use PhpOffice\PhpSpreadsheet\Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 
 #[Route('/contao/_rsz_praesenzkontrolle_download', name: 'markocupic_rsz_praesenzkontrolle_download', defaults: ['_scope' => 'backend'])]
 class RszPraesenzkontrolleDownloadController
